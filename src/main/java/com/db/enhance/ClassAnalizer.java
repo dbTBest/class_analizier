@@ -26,19 +26,107 @@ public class ClassAnalizer {
             is.read(cb, 0, ibn);
             getMagicNumber(cb);
             getJDKVersion(cb);
-            int offset=getConstantPoolInfo(cb);
-            getAccessTags(cb,offset);
+            int
+                    cpieo=getConstantPoolInfo(cb),
+                    ateo=getAccessTags(cb,cpieo),
+                    cieo=getClassIndex(cb,ateo),
+                    scieo=getSuperClassIndex(cb,cieo),
+                    iseo=getInterfaceSet(cb,scieo),
+                    ftseo=getFieldTableSet(cb,iseo),
+                    mtseo=getMethodTableSet(cb,ftseo);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void getAccessTags(byte[] cb,int offset){
+    public int getMethodTableSet(byte[] cb,int offset){
+        int sum=0;
+        for(int i=0;i<2;i++){
+            sum+=(cb[offset+i]<<24)>>>(24-8*(1-i));
+        }
+        System.out.println("方法表数据个数："+sum);
+        offset+=2;
+        if(sum>0){
+            int counter=0;
+            while(counter++<=sum-1){
+                System.out.println("第"+counter+"个方法");
+                int af=0;
+                for(int i=0;i<2;i++){
+                    af+=(cb[offset+i]<<24)>>>(24-8*(1-i));
+                }
+                System.out.println("访问标志："+af);
+                offset+=2;
+                int ni=0;
+                for(int i=0;i<2;i++){
+                    ni+=(cb[offset+i]<<24)>>>(24-8*(1-i));
+                }
+                System.out.println("名称索引："+ni);
+                offset+=2;
+                int di=0;
+                for(int i=0;i<2;i++){
+                    di+=(cb[offset+i]<<24)>>>(24-8*(1-i));
+                }
+                System.out.println("描述符索引："+di);
+                offset+=2;
+                int ac=0;
+                for(int i=0;i<2;i++){
+                    ac+=(cb[offset+i]<<24)>>>(24-8*(1-i));
+                }
+                System.out.println("属性表个数："+ac);
+                if(ac>0){
+
+                }
+            }
+        }
+        return offset;
+    }
+
+    public int getFieldTableSet(byte[] cb,int offset){
+        int sum=0;
+        for(int i=0;i<2;i++){
+            sum+=(cb[offset+i]<<24)>>>(24-8*(1-i));
+        }
+        System.out.println("字段表数据个数："+sum);
+        offset+=2;
+        if(sum>0){
+        }
+        return offset;
+    }
+
+    public int getClassIndex(byte[] cb,int offset){
+        int sum=0;
+        for(int i=0;i<2;i++){
+            sum+=(cb[offset+i]<<24)>>>(24-8*(1-i));
+        }
+        System.out.println("类索引："+sum);
+        return offset+2;
+    }
+
+    public int getSuperClassIndex(byte[] cb,int offset){
+        int sum=0;
+        for(int i=0;i<2;i++){
+            sum+=(cb[offset+i]<<24)>>>(24-8*(1-i));
+        }
+        System.out.println("父类索引："+sum);
+        return offset+2;
+    }
+
+    public int getInterfaceSet(byte[] cb,int offset){
+        int sum=0;
+        for(int i=0;i<2;i++){
+            sum+=(cb[offset+i]<<24)>>>(24-8*(1-i));
+        }
+        System.out.println("接口集合元素个数："+sum);
+        return offset+2;
+    }
+
+    public int getAccessTags(byte[] cb,int offset){
         int sum=0;
         for(int i=0;i<2;i++){
             sum+=(cb[offset+i]<<24)>>>(24-(1-i)*8);
         }
         System.out.println("访问标志为："+Integer.toHexString((short)sum));
+        return offset+2;
     }
 
     public void getMagicNumber(byte[] cb){
